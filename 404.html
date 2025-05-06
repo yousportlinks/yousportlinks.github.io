@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <title>Opening YouSport App...</title>
     <script>
+      let fallbackTimeout;
+
+      function isAlreadyInBrowser() {
+        return window.location.search.includes("from=fallback");
+      }
+
       window.onload = function () {
         const path = window.location.pathname;
 
@@ -12,18 +18,40 @@
           .replace(/^\/+/, "");
 
         const appLink = `yousport://${cleanPath}`;
-
         const fallbackUrl = `https://yousportbeta.wordpress.com`;
 
-        window.location.href = appLink;
+        if (!isAlreadyInBrowser()) {
+          window.location.href = appLink;
 
-        setTimeout(() => {
-          window.location.href = fallbackUrl;
-        }, 1000);
+          fallbackTimeout = setTimeout(() => {
+            window.location.href = window.location.href + "?from=fallback";
+          }, 5000);
+        }
       };
+
+      function openInBrowser() {
+        clearTimeout(fallbackTimeout);
+
+        const url = window.location.href.includes("?")
+          ? window.location.href + "&from=fallback"
+          : window.location.href + "?from=fallback";
+
+        window.open(url, "_blank");
+      }
     </script>
   </head>
   <body>
     <p>Trying to open the app...</p>
+
+    <script>
+      if (!window.location.search.includes("from=fallback")) {
+        document.write(`
+          <p>
+            If your app didn't open,
+            <a href="#" onclick="openInBrowser()">tap here to open in your browser</a>.
+          </p>
+        `);
+      }
+    </script>
   </body>
 </html>
