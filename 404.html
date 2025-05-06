@@ -33,6 +33,14 @@
             // For in-app browsers
             document.getElementById("inapp-section").style.display = "block";
             document.getElementById("loading-message").style.display = "none";
+
+            // Try to open app directly from in-app browser
+            // Some in-app browsers still allow direct app opening
+            setTimeout(() => {
+              document.getElementById("direct-app-link").href = appLink;
+              document.getElementById("direct-app-attempt").style.display =
+                "block";
+            }, 1000);
           } else {
             // For regular browsers
             // Try to open the app with appropriate method for platform
@@ -53,15 +61,25 @@
         }
       };
 
+      // Multiple different methods to try opening browser
       function openInExternalBrowser() {
+        // Method 1: window.open with _system (works in some webviews)
         try {
-          // Try to open in system browser
           window.open(window.location.href, "_system");
         } catch (e) {
-          console.error("Could not open in system browser", e);
-          // Show fallback message if opening browser fails
-          document.getElementById("manual-open").style.display = "block";
+          console.error("Method 1 failed:", e);
         }
+
+        // Method 2: location.href with special schemes (works in some Android webviews)
+        try {
+          window.location.href =
+            "https://" + window.location.href.split("//")[1];
+        } catch (e) {
+          console.error("Method 2 failed:", e);
+        }
+
+        // Show manual instructions regardless
+        document.getElementById("manual-open").style.display = "block";
       }
     </script>
     <style>
@@ -121,6 +139,27 @@
         font-family: monospace;
         word-break: break-all;
         margin: 10px 0;
+        user-select: all;
+      }
+      .or-divider {
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        text-align: center;
+      }
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+      }
+      .or-divider span {
+        padding: 0 10px;
+        color: #777;
+      }
+      .direct-attempt {
+        margin-top: 20px;
+        display: none;
       }
     </style>
   </head>
@@ -135,21 +174,32 @@
           You're viewing this from inside another app which prevents direct app
           opening.
         </p>
+
+        <!-- Option 1: Try direct app deep link -->
+        <div id="direct-app-attempt" class="direct-attempt">
+          <p>Try opening the app directly:</p>
+          <a id="direct-app-link" class="fallback-button">Open YouSport App</a>
+        </div>
+
+        <div class="or-divider"><span>OR</span></div>
+
+        <!-- Option 2: Try browser opening -->
+        <p>Try opening in your browser:</p>
         <button onclick="openInExternalBrowser()" class="system-button">
           Open in Browser
         </button>
 
-        <!-- Manual steps if window.open fails -->
+        <!-- Manual steps shown right away -->
         <div id="manual-open" class="manual-steps">
-          <p><strong>If the browser didn't open automatically:</strong></p>
+          <p><strong>If automatic methods don't work:</strong></p>
           <ol>
-            <li>Copy this URL:</li>
-            <div class="url-display" onclick="this.select();">
+            <li>Long-press and copy this URL:</li>
+            <div class="url-display">
               <script>
                 document.write(window.location.href);
               </script>
             </div>
-            <li>Open your default browser</li>
+            <li>Manually open your device's browser</li>
             <li>Paste the URL in the address bar</li>
           </ol>
         </div>
