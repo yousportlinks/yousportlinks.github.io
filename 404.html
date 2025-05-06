@@ -18,39 +18,53 @@
           .replace(/^\/+/, "");
 
         const appLink = `yousport://${cleanPath}`;
-        const fallbackUrl = `https://yousportbeta.wordpress.com`;
 
         if (!isAlreadyInBrowser()) {
+          // Try to open the app
           window.location.href = appLink;
 
+          // Fallback after delay
           fallbackTimeout = setTimeout(() => {
-            window.location.href = window.location.href + "?from=fallback";
+            const fallbackUrl = window.location.href.includes("?")
+              ? window.location.href + "&from=fallback"
+              : window.location.href + "?from=fallback";
+            window.location.href = fallbackUrl;
           }, 5000);
         }
       };
-
-      function openInBrowser() {
-        clearTimeout(fallbackTimeout);
-
-        const url = window.location.href.includes("?")
-          ? window.location.href + "&from=fallback"
-          : window.location.href + "?from=fallback";
-
-        window.open(url, "_blank");
-      }
     </script>
+    <style>
+      .fallback-button {
+        display: inline-block;
+        padding: 10px 16px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-top: 12px;
+      }
+    </style>
   </head>
   <body>
     <p>Trying to open the app...</p>
 
+    <!-- Fallback link (only shown before redirect) -->
+    <p id="fallback-message" style="display: none">
+      If your app didn't open,
+      <a id="fallback-link" class="fallback-button" target="_blank"
+        >Tap here to open in your browser</a
+      >
+    </p>
+
     <script>
-      if (!window.location.search.includes("from=fallback")) {
-        document.write(`
-          <p>
-            If your app didn't open,
-            <a href="#" onclick="openInBrowser()">tap here to open in your browser</a>.
-          </p>
-        `);
+      if (!isAlreadyInBrowser()) {
+        const fallbackUrl = window.location.href.includes("?")
+          ? window.location.href + "&from=fallback"
+          : window.location.href + "?from=fallback";
+
+        const link = document.getElementById("fallback-link");
+        link.href = fallbackUrl;
+        document.getElementById("fallback-message").style.display = "block";
       }
     </script>
   </body>
