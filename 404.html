@@ -37,8 +37,6 @@
     <meta property="al:ios:app_store_id" content="YOURAPPID" />
     <meta property="al:ios:url" content="yousport://" /> -->
 
-    <link rel="preload" as="image/svg+xml" href="logo.svg" />
-
     <script type="application/ld+json">
       {
         "@context": "http://schema.org",
@@ -280,10 +278,6 @@
         width: 56px;
         height: 56px;
         object-fit: contain;
-        max-width: 100%;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        will-change: transform;
       }
 
       .button {
@@ -399,12 +393,11 @@
       <div id="loading">
         <div class="logo-container">
           <img
-            src="logo.svg"
+            src="logo.png"
             alt="YouSport"
             class="logo-img"
             width="56"
             height="56"
-            onerror="this.style.display='none'; document.getElementById('fallback-text-1').style.display='flex';"
           />
           <span id="fallback-text-1" class="logo-text" style="display: none"
             >YS</span
@@ -417,12 +410,11 @@
       <div id="inapp-section">
         <div class="logo-container">
           <img
-            src="logo.svg"
+            src="logo.png"
             alt="YouSport"
             class="logo-img"
             width="56"
             height="56"
-            onerror="this.style.display='none'; document.getElementById('fallback-text-2').style.display='flex';"
           />
           <span id="fallback-text-2" class="logo-text" style="display: none"
             >YS</span
