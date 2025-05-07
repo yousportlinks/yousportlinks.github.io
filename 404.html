@@ -2,232 +2,43 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Opening YouSport App...</title>
+    <title>Redirecting to YouSport...</title>
     <script>
-      let fallbackTimeout;
+      const WEBSITE_URL = "https://yousportbeta.wordpress.com";
 
-      function isAlreadyInBrowser() {
-        return window.location.search.includes("from=fallback");
-      }
-
-      function isInAppBrowser() {
-        return /FB_IAB|FBAN|FBAV|Instagram|Twitter|Pinterest|Line|NAVER|kakaowork|KAKAOTALK|WhatsApp|Telegram/i.test(
-          navigator.userAgent
-        );
-      }
+      const REDIRECT_TIMEOUT = 1500;
 
       window.onload = function () {
         const path = window.location.pathname;
-        const cleanPath = path
-          .replace("/yousport-links", "")
-          .replace(/^\/+/, "");
+        const cleanPath = path.replace(/^\/+/, "");
 
         const appLink = `yousport://${cleanPath}`;
-        // Add Android intent URL with fallback
-        const intentUrl = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yoursportapp.package;S.browser_fallback_url=${encodeURIComponent(
-          window.location.href
-        )};end`;
 
-        if (!isAlreadyInBrowser()) {
-          if (isInAppBrowser()) {
-            // For in-app browsers
-            document.getElementById("inapp-section").style.display = "block";
-            document.getElementById("loading-message").style.display = "none";
+        const websiteUrl = WEBSITE_URL + "/" + cleanPath;
 
-            // Try to open app directly from in-app browser
-            // Some in-app browsers still allow direct app opening
-            setTimeout(() => {
-              document.getElementById("direct-app-link").href = appLink;
-              document.getElementById("direct-app-attempt").style.display =
-                "block";
-            }, 1000);
-          } else {
-            // For regular browsers
-            // Try to open the app with appropriate method for platform
-            if (/android/i.test(navigator.userAgent)) {
-              window.location.href = intentUrl;
-            } else {
-              window.location.href = appLink;
-            }
+        if (/android/i.test(navigator.userAgent)) {
+          window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
+            websiteUrl
+          )};end`;
+        } else {
+          window.location.href = appLink;
 
-            // Fallback after delay
-            fallbackTimeout = setTimeout(() => {
-              const fallbackUrl = window.location.href.includes("?")
-                ? window.location.href + "&from=fallback"
-                : window.location.href + "?from=fallback";
-              window.location.href = fallbackUrl;
-            }, 5000);
-          }
+          setTimeout(function () {
+            window.location.href = websiteUrl;
+          }, REDIRECT_TIMEOUT);
         }
       };
-
-      // Multiple different methods to try opening browser
-      function openInExternalBrowser() {
-        // Method 1: window.open with _system (works in some webviews)
-        try {
-          window.open(window.location.href, "_system");
-        } catch (e) {
-          console.error("Method 1 failed:", e);
-        }
-
-        // Method 2: location.href with special schemes (works in some Android webviews)
-        try {
-          window.location.href =
-            "https://" + window.location.href.split("//")[1];
-        } catch (e) {
-          console.error("Method 2 failed:", e);
-        }
-
-        // Show manual instructions regardless
-        document.getElementById("manual-open").style.display = "block";
-      }
     </script>
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          Arial, sans-serif;
         text-align: center;
-        margin: 0;
-        padding: 20px;
-        line-height: 1.5;
-      }
-      .container {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .fallback-button {
-        display: inline-block;
-        padding: 10px 16px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 6px;
-        margin-top: 12px;
-      }
-      .system-button {
-        padding: 12px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-      }
-      .note {
-        font-size: 14px;
-        color: #666;
-        margin-top: 15px;
-      }
-      .manual-steps {
-        margin-top: 20px;
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        display: none;
-        text-align: left;
-      }
-      .manual-steps ol {
-        margin: 10px 0 10px 20px;
-        padding-left: 15px;
-      }
-      .url-display {
-        background: #eee;
-        padding: 10px;
-        border-radius: 4px;
-        font-family: monospace;
-        word-break: break-all;
-        margin: 10px 0;
-        user-select: all;
-      }
-      .or-divider {
-        margin: 20px 0;
-        display: flex;
-        align-items: center;
-        text-align: center;
-      }
-      .or-divider::before,
-      .or-divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid #ddd;
-      }
-      .or-divider span {
-        padding: 0 10px;
-        color: #777;
-      }
-      .direct-attempt {
-        margin-top: 20px;
-        display: none;
+        padding: 30px;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <p id="loading-message">Trying to open the app...</p>
-
-      <!-- Special section for in-app browsers -->
-      <div id="inapp-section" style="display: none">
-        <h2>Open YouSport App</h2>
-        <p>
-          You're viewing this from inside another app which prevents direct app
-          opening.
-        </p>
-
-        <!-- Option 1: Try direct app deep link -->
-        <div id="direct-app-attempt" class="direct-attempt">
-          <p>Try opening the app directly:</p>
-          <a id="direct-app-link" class="fallback-button">Open YouSport App</a>
-        </div>
-
-        <div class="or-divider"><span>OR</span></div>
-
-        <!-- Option 2: Try browser opening -->
-        <p>Try opening in your browser:</p>
-        <button onclick="openInExternalBrowser()" class="system-button">
-          Open in Browser
-        </button>
-
-        <!-- Manual steps shown right away -->
-        <div id="manual-open" class="manual-steps">
-          <p><strong>If automatic methods don't work:</strong></p>
-          <ol>
-            <li>Long-press and copy this URL:</li>
-            <div class="url-display">
-              <script>
-                document.write(window.location.href);
-              </script>
-            </div>
-            <li>Manually open your device's browser</li>
-            <li>Paste the URL in the address bar</li>
-          </ol>
-        </div>
-
-        <p class="note">
-          Opening in your default browser will let us redirect you to the app.
-        </p>
-      </div>
-
-      <!-- Fallback link (only shown before redirect) -->
-      <p id="fallback-message" style="display: none">
-        If your app didn't open,
-        <a id="fallback-link" class="fallback-button" target="_blank">
-          Tap here to open in your browser
-        </a>
-      </p>
-    </div>
-
-    <script>
-      if (!isAlreadyInBrowser()) {
-        const fallbackUrl = window.location.href.includes("?")
-          ? window.location.href + "&from=fallback"
-          : window.location.href + "?from=fallback";
-
-        const link = document.getElementById("fallback-link");
-        link.href = fallbackUrl;
-        document.getElementById("fallback-message").style.display = "block";
-      }
-    </script>
+    <p>Redirecting you to YouSport...</p>
   </body>
 </html>
