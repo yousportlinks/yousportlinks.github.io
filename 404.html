@@ -23,11 +23,30 @@
           document.getElementById("loading").style.display = "none";
           document.getElementById("inapp-section").style.display = "block";
 
-          document.getElementById("app-button").href = appLink;
-          document.getElementById("web-button").href = websiteUrl;
+          document
+            .getElementById("app-button")
+            .addEventListener("click", function () {
+              window.location.href = appLink;
+              window.location = appLink;
+
+              const iframe = document.createElement("iframe");
+              iframe.style.display = "none";
+              iframe.src = appLink;
+              document.body.appendChild(iframe);
+
+              document.getElementById("attempt-message").style.display =
+                "block";
+            });
+
+          document
+            .getElementById("web-button")
+            .addEventListener("click", function () {
+              window.open(websiteUrl, "_blank");
+              window.location = websiteUrl;
+            });
 
           setTimeout(function () {
-            window.location.href = websiteUrl;
+            window.location = websiteUrl;
           }, 3000);
         } else {
           if (/android/i.test(navigator.userAgent)) {
@@ -64,6 +83,7 @@
         border-radius: 6px;
         font-weight: bold;
         margin: 8px;
+        cursor: pointer;
       }
       .web-button {
         background-color: #28a745;
@@ -75,6 +95,14 @@
         font-size: 14px;
         color: #666;
         margin-top: 20px;
+      }
+      #attempt-message {
+        display: none;
+        margin-top: 15px;
+        color: #856404;
+        background-color: #fff3cd;
+        padding: 10px;
+        border-radius: 4px;
       }
     </style>
   </head>
@@ -88,8 +116,13 @@
         <h2>Open in YouSport</h2>
         <p>Choose how you want to continue:</p>
 
-        <a id="app-button" class="button">Open in App</a>
-        <a id="web-button" class="button web-button">View on Website</a>
+        <div id="app-button" class="button">Open in App</div>
+        <div id="web-button" class="button web-button">View on Website</div>
+
+        <div id="attempt-message">
+          Attempting to open app... If nothing happens, please tap "View on
+          Website" instead.
+        </div>
 
         <p class="auto-text">
           Automatically redirecting to website in 3 seconds...
