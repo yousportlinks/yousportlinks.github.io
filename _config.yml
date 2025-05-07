@@ -1,1 +1,8 @@
-include: [".well-known", "logo.svg", "logo.png", "og-image.png"]
+include:
+  [
+    ".well-known",
+    "logo.svg",
+    "logo.png",
+    "og-image.png",
+    "apple-touch-icon.png",
+  ]
