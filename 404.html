@@ -120,7 +120,7 @@
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
         const customSchemeLink = `yousport://${cleanPath}`;
-        const websiteUrl = WEBSITE_URL + "/" + cleanPath;
+        const websiteUrl = WEBSITE_URL;
 
         // Set up link for copying
         const linkToCopy = window.location.href;
@@ -143,8 +143,7 @@
         }
 
         // For in-app browsers - show specific UI without auto-redirect
-        const isInApp = isInAppBrowser();
-        console.log("Is in app browser:", isInApp); // Debug
+        const isInApp = !isInAppBrowser();
 
         const loadingSection = document.getElementById("loading");
         const inappSection = document.getElementById("inapp-section");
@@ -226,6 +225,9 @@
         width: 56px;
         height: 56px;
         object-fit: contain;
+        /* Fix for SVG rendering */
+        image-rendering: optimizeQuality;
+        shape-rendering: geometricPrecision;
       }
 
       .button {
