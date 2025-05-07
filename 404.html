@@ -38,8 +38,16 @@
           hu: "Megpróbálhatod az alkalmazást megnyitni, de valószínűleg nem fog működni:",
         },
         openExternal: {
-          en: "For the best experience, please open this link in Safari/Chrome:",
-          hu: "A legjobb élmény érdekében, kérjük nyisd meg ezt a linket Safari/Chrome böngészőben:",
+          en: "For the best experience, find and tap the option to 'Open in Safari/Chrome' in your browser menu, or copy this link:",
+          hu: "A legjobb élmény érdekében keresd meg és válaszd a 'Megnyitás Safari/Chrome-ban' opciót a böngésző menüjében, vagy másold ki ezt a linket:",
+        },
+        browserMenuHint: {
+          en: "Look for the ⋮ or … menu icon in your current browser",
+          hu: "Keresd a ⋮ vagy … menü ikont a jelenlegi böngésződben",
+        },
+        orCopyText: {
+          en: "Or copy and paste this link:",
+          hu: "Vagy másold ki és illeszd be ezt a linket:",
         },
         appButton: {
           en: "Open App",
@@ -90,6 +98,9 @@
         document.getElementById("app-try-text").textContent = t("appTryText");
         document.getElementById("external-hint").textContent =
           t("openExternal");
+        document.getElementById("browser-menu-hint").textContent =
+          t("browserMenuHint");
+        document.getElementById("or-copy-text").textContent = t("orCopyText");
         document.getElementById("app-button").textContent = t("appButton");
         document.getElementById("copy-hint").textContent = t("copyHint");
         document.getElementById("copy-status").textContent = t("copied");
@@ -169,8 +180,8 @@
 
       .logo-container {
         background-color: var(--yousport-green);
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         margin: 0 auto 20px;
         border-radius: 16px;
         display: flex;
@@ -180,8 +191,9 @@
       }
 
       .logo {
-        width: 70px;
-        height: auto;
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
       }
 
       .button {
@@ -213,6 +225,13 @@
       .copy-block {
         margin-top: 20px;
         padding-top: 10px;
+      }
+
+      .browser-menu-hint {
+        font-size: 14px;
+        color: #666;
+        margin: 8px 0 15px;
+        font-style: italic;
       }
 
       .option-section {
@@ -276,6 +295,12 @@
         margin-bottom: 8px;
         font-size: 15px;
       }
+
+      .or-divider {
+        margin: 15px 0;
+        font-size: 14px;
+        color: #666;
+      }
     </style>
   </head>
   <body>
@@ -283,7 +308,7 @@
       <!-- Default loading for direct browsers -->
       <div id="loading">
         <div class="logo-container">
-          <img src="logo.png" alt="YouSport" class="logo" />
+          <img src="logo.png?v=3" alt="YouSport" class="logo" />
         </div>
         <p id="loading-text"></p>
       </div>
@@ -291,7 +316,7 @@
       <!-- Special section for in-app browsers -->
       <div id="inapp-section">
         <div class="logo-container">
-          <img src="logo.png" alt="YouSport" class="logo" />
+          <img src="logo.png?v=3" alt="YouSport" class="logo" />
         </div>
 
         <h2 id="inapp-title"></h2>
@@ -299,6 +324,8 @@
 
         <div class="copy-block">
           <p id="external-hint"></p>
+          <p id="browser-menu-hint" class="browser-menu-hint"></p>
+
           <div id="copy-link" class="copy-area"></div>
           <p id="copy-hint" class="copy-hint"></p>
         </div>
