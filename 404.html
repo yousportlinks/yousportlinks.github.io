@@ -16,7 +16,10 @@
       window.onload = function () {
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
-        const appLink = `yousport://${cleanPath}`;
+
+        const universalLink = `https://yousportlinks.github.io/${cleanPath}`;
+
+        const customSchemeLink = `yousport://${cleanPath}`;
         const websiteUrl = WEBSITE_URL + "/" + cleanPath;
 
         if (isInAppBrowser()) {
@@ -26,13 +29,16 @@
           document
             .getElementById("app-button")
             .addEventListener("click", function () {
-              window.location.href = appLink;
-              window.location = appLink;
+              window.location.href = universalLink;
 
-              const iframe = document.createElement("iframe");
-              iframe.style.display = "none";
-              iframe.src = appLink;
-              document.body.appendChild(iframe);
+              setTimeout(function () {
+                window.location = customSchemeLink;
+
+                const iframe = document.createElement("iframe");
+                iframe.style.display = "none";
+                iframe.src = customSchemeLink;
+                document.body.appendChild(iframe);
+              }, 500);
 
               document.getElementById("attempt-message").style.display =
                 "block";
@@ -50,11 +56,20 @@
           }, 3000);
         } else {
           if (/android/i.test(navigator.userAgent)) {
-            window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
-              websiteUrl
-            )};end`;
+            window.location.href = universalLink;
+
+            setTimeout(function () {
+              window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
+                websiteUrl
+              )};end`;
+            }, 500);
           } else {
-            window.location.href = appLink;
+            window.location.href = universalLink;
+
+            setTimeout(function () {
+              window.location.href = customSchemeLink;
+            }, 500);
+
             setTimeout(function () {
               window.location.href = websiteUrl;
             }, REDIRECT_TIMEOUT);
