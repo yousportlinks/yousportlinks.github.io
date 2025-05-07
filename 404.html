@@ -31,6 +31,12 @@
     <meta name="format-detection" content="telephone=no" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 
+    <!-- Add when app is released-->
+    <!-- <meta name="apple-itunes-app" content="app-id=YOURAPPID" />
+    <meta property="al:ios:app_name" content="YouSport" />
+    <meta property="al:ios:app_store_id" content="YOURAPPID" />
+    <meta property="al:ios:url" content="yousport://" /> -->
+
     <link rel="preload" as="image/svg+xml" href="logo.svg" />
 
     <script type="application/ld+json">
@@ -274,9 +280,10 @@
         width: 56px;
         height: 56px;
         object-fit: contain;
-        /* SVG rendering fixes */
         max-width: 100%;
         transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform;
       }
 
       .button {
@@ -395,6 +402,8 @@
             src="logo.svg"
             alt="YouSport"
             class="logo-img"
+            width="56"
+            height="56"
             onerror="this.style.display='none'; document.getElementById('fallback-text-1').style.display='flex';"
           />
           <span id="fallback-text-1" class="logo-text" style="display: none"
@@ -411,13 +420,14 @@
             src="logo.svg"
             alt="YouSport"
             class="logo-img"
+            width="56"
+            height="56"
             onerror="this.style.display='none'; document.getElementById('fallback-text-2').style.display='flex';"
           />
           <span id="fallback-text-2" class="logo-text" style="display: none"
             >YS</span
           >
         </div>
-
         <h2 id="inapp-title"></h2>
         <p id="inapp-desc"></p>
 
