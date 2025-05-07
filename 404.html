@@ -38,8 +38,8 @@
           hu: "Megpróbálhatod az alkalmazást megnyitni, de valószínűleg nem fog működni:",
         },
         openExternal: {
-          en: "For the best experience, find and tap the option to 'Open in Safari/Chrome' in your browser menu, or copy this link:",
-          hu: "A legjobb élmény érdekében keresd meg és válaszd a 'Megnyitás Safari/Chrome-ban' opciót a böngésző menüjében, vagy másold ki ezt a linket:",
+          en: "For the best experience, find and tap the option to 'Open in Safari/Chrome' in your browser menu, or copy this link and open it in your browser:",
+          hu: "A legjobb élmény érdekében keresd meg és válaszd a 'Megnyitás Safari/Chrome-ban' opciót a jelenlegi böngésző menüjében, vagy másold ki ezt a linket és másold be a böngésződbe:",
         },
         browserMenuHint: {
           en: "Look for the ⋮ or … menu icon in your current browser",
@@ -68,6 +68,16 @@
         return translations[key][lang] || translations[key]["en"];
       }
 
+      // Helper function to safely set text content
+      function setTextContent(id, text) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.textContent = text;
+        } else {
+          console.warn(`Element with id '${id}' not found`);
+        }
+      }
+
       function isInAppBrowser() {
         return /FB_IAB|FBAN|FBAV|Instagram|Twitter|Pinterest|Line|NAVER|kakaowork|KAKAOTALK|WhatsApp|Telegram|Messenger/i.test(
           navigator.userAgent
@@ -78,11 +88,14 @@
         navigator.clipboard
           .writeText(text)
           .then(() => {
-            document.getElementById("copy-status").textContent = t("copied");
-            document.getElementById("copy-status").style.display = "block";
-            setTimeout(() => {
-              document.getElementById("copy-status").style.display = "none";
-            }, 2000);
+            const copyStatus = document.getElementById("copy-status");
+            if (copyStatus) {
+              copyStatus.textContent = t("copied");
+              copyStatus.style.display = "block";
+              setTimeout(() => {
+                copyStatus.style.display = "none";
+              }, 2000);
+            }
           })
           .catch((err) => {
             console.error("Failed to copy: ", err);
@@ -90,20 +103,19 @@
       }
 
       window.onload = function () {
-        // Apply translations
+        console.log("Window loaded"); // Debug
+
+        // Apply translations safely
         document.title = t("title");
-        document.getElementById("loading-text").textContent = t("loading");
-        document.getElementById("inapp-title").textContent = t("inAppTitle");
-        document.getElementById("inapp-desc").textContent = t("inAppDesc");
-        document.getElementById("app-try-text").textContent = t("appTryText");
-        document.getElementById("external-hint").textContent =
-          t("openExternal");
-        document.getElementById("browser-menu-hint").textContent =
-          t("browserMenuHint");
-        document.getElementById("or-copy-text").textContent = t("orCopyText");
-        document.getElementById("app-button").textContent = t("appButton");
-        document.getElementById("copy-hint").textContent = t("copyHint");
-        document.getElementById("copy-status").textContent = t("copied");
+        setTextContent("loading-text", t("loading"));
+        setTextContent("inapp-title", t("inAppTitle"));
+        setTextContent("inapp-desc", t("inAppDesc"));
+        setTextContent("app-try-text", t("appTryText"));
+        setTextContent("external-hint", t("openExternal"));
+        setTextContent("browser-menu-hint", t("browserMenuHint"));
+        setTextContent("app-button", t("appButton"));
+        setTextContent("copy-hint", t("copyHint"));
+        setTextContent("copy-status", t("copied"));
 
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
@@ -112,26 +124,38 @@
 
         // Set up link for copying
         const linkToCopy = window.location.href;
-        document.getElementById("copy-link").textContent = linkToCopy;
+        const copyLink = document.getElementById("copy-link");
+        if (copyLink) {
+          copyLink.textContent = linkToCopy;
 
-        // Make both the link area and the hint text clickable for copying
-        document.getElementById("copy-link").onclick = function () {
-          copyToClipboard(linkToCopy);
-        };
-        document.getElementById("copy-hint").onclick = function () {
-          copyToClipboard(linkToCopy);
-        };
+          // Make the link area clickable for copying
+          copyLink.onclick = function () {
+            copyToClipboard(linkToCopy);
+          };
+        }
+
+        // Make the hint text clickable for copying
+        const copyHint = document.getElementById("copy-hint");
+        if (copyHint) {
+          copyHint.onclick = function () {
+            copyToClipboard(linkToCopy);
+          };
+        }
 
         // For in-app browsers - show specific UI without auto-redirect
-        if (isInAppBrowser()) {
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("inapp-section").style.display = "block";
+        const isInApp = isInAppBrowser();
+        console.log("Is in app browser:", isInApp); // Debug
+
+        const loadingSection = document.getElementById("loading");
+        const inappSection = document.getElementById("inapp-section");
+        const appButton = document.getElementById("app-button");
+
+        if (isInApp) {
+          if (loadingSection) loadingSection.style.display = "none";
+          if (inappSection) inappSection.style.display = "block";
 
           // Set direct links (though they may not work in in-app browsers)
-          document.getElementById("app-button").href = customSchemeLink;
-
-          // No auto-redirect timeout for in-app browsers
-          // Let users read the message and choose their action
+          if (appButton) appButton.href = customSchemeLink;
         } else {
           // For regular browsers, try to open app then fallback to website
           if (/android/i.test(navigator.userAgent)) {
@@ -139,6 +163,7 @@
               websiteUrl
             )};end`;
           } else {
+            // iOS and others
             window.location.href = customSchemeLink;
             setTimeout(function () {
               window.location.href = websiteUrl;
@@ -190,7 +215,14 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
 
-      .logo {
+      /* Fallback text when logo doesn't load */
+      .logo-text {
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .logo-img {
         width: 56px;
         height: 56px;
         object-fit: contain;
@@ -308,7 +340,14 @@
       <!-- Default loading for direct browsers -->
       <div id="loading">
         <div class="logo-container">
-          <img src="logo.png?v=3" alt="YouSport" class="logo" />
+          <!-- You can try adding the logo with img tag directly here -->
+          <img
+            src="logo.png"
+            alt="YouSport"
+            class="logo-img"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          />
+          <span class="logo-text" style="display: none">YS</span>
         </div>
         <p id="loading-text"></p>
       </div>
@@ -316,7 +355,14 @@
       <!-- Special section for in-app browsers -->
       <div id="inapp-section">
         <div class="logo-container">
-          <img src="logo.png?v=3" alt="YouSport" class="logo" />
+          <!-- Same approach for the logo in this section -->
+          <img
+            src="logo.png"
+            alt="YouSport"
+            class="logo-img"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+          />
+          <span class="logo-text" style="display: none">YS</span>
         </div>
 
         <h2 id="inapp-title"></h2>
@@ -324,7 +370,6 @@
 
         <div class="copy-block">
           <p id="external-hint"></p>
-          <p id="browser-menu-hint" class="browser-menu-hint"></p>
 
           <div id="copy-link" class="copy-area"></div>
           <p id="copy-hint" class="copy-hint"></p>
