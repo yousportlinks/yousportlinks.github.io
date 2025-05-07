@@ -13,29 +13,52 @@
       const userLang = (navigator.language || navigator.userLanguage)
         .substring(0, 2)
         .toLowerCase();
-      const isHungarian = userLang === "hu";
+      const lang = userLang === "hu" ? "hu" : "en";
 
+      // Structured translations with language keys
       const translations = {
-        title: isHungarian ? "YouSport megnyitása" : "Open YouSport",
-        loading: isHungarian
-          ? "Átirányítás a YouSport alkalmazásba..."
-          : "Redirecting to YouSport app...",
-        inAppTitle: isHungarian
-          ? "Nem támogatott böngésző"
-          : "Unsupported Browser",
-        inAppDesc: isHungarian
-          ? "Úgy tűnik, egy alkalmazáson belüli böngészőt használsz, amely nem támogatja az alkalmazások közvetlen megnyitását."
-          : "You're using an in-app browser that doesn't support direct app opening.",
-        openExternal: isHungarian
-          ? "A legjobb élmény érdekében, kérjük másold ki ezt a linket és nyisd meg Safari/Chrome böngészőben:"
-          : "For the best experience, please copy this link and open it in Safari/Chrome:",
-        appButton: isHungarian ? "Alkalmazás megnyitása" : "Open App",
-        webButton: isHungarian ? "Weboldal megnyitása" : "Open Website",
-        copyHint: isHungarian
-          ? "Kattints a linkre a másoláshoz"
-          : "Tap to copy link",
-        copied: isHungarian ? "Másolva!" : "Copied!",
+        title: {
+          en: "Open YouSport",
+          hu: "YouSport megnyitása",
+        },
+        loading: {
+          en: "Redirecting to YouSport app...",
+          hu: "Átirányítás a YouSport alkalmazásba...",
+        },
+        inAppTitle: {
+          en: "Unsupported Browser",
+          hu: "Nem támogatott böngésző",
+        },
+        inAppDesc: {
+          en: "You're using an in-app browser that doesn't support direct app opening.",
+          hu: "Úgy tűnik, egy alkalmazáson belüli böngészőt használsz, amely nem támogatja az alkalmazások közvetlen megnyitását.",
+        },
+        appTryText: {
+          en: "You can try opening the app, but it may not work:",
+          hu: "Megpróbálhatod az alkalmazást megnyitni, de valószínűleg nem fog működni:",
+        },
+        openExternal: {
+          en: "For the best experience, please open this link in Safari/Chrome:",
+          hu: "A legjobb élmény érdekében, kérjük nyisd meg ezt a linket Safari/Chrome böngészőben:",
+        },
+        appButton: {
+          en: "Open App",
+          hu: "Alkalmazás megnyitása",
+        },
+        copyHint: {
+          en: "Tap to copy link",
+          hu: "Kattints a linkre a másoláshoz",
+        },
+        copied: {
+          en: "Copied!",
+          hu: "Másolva!",
+        },
       };
+
+      // Helper function to get translation
+      function t(key) {
+        return translations[key][lang] || translations[key]["en"];
+      }
 
       function isInAppBrowser() {
         return /FB_IAB|FBAN|FBAV|Instagram|Twitter|Pinterest|Line|NAVER|kakaowork|KAKAOTALK|WhatsApp|Telegram|Messenger/i.test(
@@ -47,8 +70,7 @@
         navigator.clipboard
           .writeText(text)
           .then(() => {
-            document.getElementById("copy-status").textContent =
-              translations.copied;
+            document.getElementById("copy-status").textContent = t("copied");
             document.getElementById("copy-status").style.display = "block";
             setTimeout(() => {
               document.getElementById("copy-status").style.display = "none";
@@ -61,23 +83,16 @@
 
       window.onload = function () {
         // Apply translations
-        document.title = translations.title;
-        document.getElementById("loading-text").textContent =
-          translations.loading;
-        document.getElementById("inapp-title").textContent =
-          translations.inAppTitle;
-        document.getElementById("inapp-desc").textContent =
-          translations.inAppDesc;
+        document.title = t("title");
+        document.getElementById("loading-text").textContent = t("loading");
+        document.getElementById("inapp-title").textContent = t("inAppTitle");
+        document.getElementById("inapp-desc").textContent = t("inAppDesc");
+        document.getElementById("app-try-text").textContent = t("appTryText");
         document.getElementById("external-hint").textContent =
-          translations.openExternal;
-        document.getElementById("app-button").textContent =
-          translations.appButton;
-        document.getElementById("web-button").textContent =
-          translations.webButton;
-        document.getElementById("copy-hint").textContent =
-          translations.copyHint;
-        document.getElementById("copy-status").textContent =
-          translations.copied;
+          t("openExternal");
+        document.getElementById("app-button").textContent = t("appButton");
+        document.getElementById("copy-hint").textContent = t("copyHint");
+        document.getElementById("copy-status").textContent = t("copied");
 
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
@@ -87,7 +102,12 @@
         // Set up link for copying
         const linkToCopy = window.location.href;
         document.getElementById("copy-link").textContent = linkToCopy;
+
+        // Make both the link area and the hint text clickable for copying
         document.getElementById("copy-link").onclick = function () {
+          copyToClipboard(linkToCopy);
+        };
+        document.getElementById("copy-hint").onclick = function () {
           copyToClipboard(linkToCopy);
         };
 
@@ -98,7 +118,6 @@
 
           // Set direct links (though they may not work in in-app browsers)
           document.getElementById("app-button").href = customSchemeLink;
-          document.getElementById("web-button").href = websiteUrl;
 
           // No auto-redirect timeout for in-app browsers
           // Let users read the message and choose their action
@@ -181,12 +200,6 @@
         color: var(--text-on-green);
       }
 
-      .web-button {
-        background-color: #f8f9fa;
-        color: #333;
-        border: 1px solid #dee2e6;
-      }
-
       .button:hover {
         opacity: 0.95;
         transform: translateY(-2px);
@@ -198,6 +211,11 @@
       }
 
       .copy-block {
+        margin-top: 20px;
+        padding-top: 10px;
+      }
+
+      .option-section {
         margin-top: 20px;
         border-top: 1px solid #eee;
         padding-top: 20px;
@@ -222,10 +240,17 @@
       }
 
       .copy-hint {
-        font-size: 12px;
+        font-size: 13px;
         color: #6c757d;
         text-align: center;
         margin-top: 5px;
+        cursor: pointer;
+        text-decoration: underline;
+        display: inline-block;
+      }
+
+      .copy-hint:hover {
+        color: #495057;
       }
 
       #copy-status {
@@ -245,6 +270,12 @@
       h2 {
         margin-top: 0;
       }
+
+      .section-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 15px;
+      }
     </style>
   </head>
   <body>
@@ -254,7 +285,7 @@
         <div class="logo-container">
           <img src="logo.png" alt="YouSport" class="logo" />
         </div>
-        <p id="loading-text">Redirecting to YouSport app...</p>
+        <p id="loading-text"></p>
       </div>
 
       <!-- Special section for in-app browsers -->
@@ -263,28 +294,22 @@
           <img src="logo.png" alt="YouSport" class="logo" />
         </div>
 
-        <h2 id="inapp-title">Unsupported Browser</h2>
-        <p id="inapp-desc">
-          You're using an in-app browser that doesn't support direct app
-          opening.
-        </p>
-
-        <div class="buttons">
-          <a id="app-button" class="button app-button" href="#">Open App</a>
-          <a id="web-button" class="button web-button" href="#">Open Website</a>
-        </div>
+        <h2 id="inapp-title"></h2>
+        <p id="inapp-desc"></p>
 
         <div class="copy-block">
-          <p id="external-hint">
-            For the best experience, please copy this link and open it in
-            Safari/Chrome:
-          </p>
+          <p id="external-hint"></p>
           <div id="copy-link" class="copy-area"></div>
-          <p id="copy-hint" class="copy-hint">Tap to copy link</p>
+          <p id="copy-hint" class="copy-hint"></p>
+        </div>
+
+        <div class="option-section">
+          <p id="app-try-text" class="section-label"></p>
+          <a id="app-button" class="button app-button" href="#"></a>
         </div>
       </div>
 
-      <div id="copy-status">Copied!</div>
+      <div id="copy-status"></div>
     </div>
   </body>
 </html>
