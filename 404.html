@@ -5,27 +5,41 @@
     <title>Redirecting to YouSport...</title>
     <script>
       const WEBSITE_URL = "https://yousportbeta.wordpress.com";
-
       const REDIRECT_TIMEOUT = 1500;
+
+      function isInAppBrowser() {
+        return /FB_IAB|FBAN|FBAV|Instagram|Twitter|Pinterest|Line|NAVER|kakaowork|KAKAOTALK|WhatsApp|Telegram|Messenger/i.test(
+          navigator.userAgent
+        );
+      }
 
       window.onload = function () {
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
-
         const appLink = `yousport://${cleanPath}`;
-
         const websiteUrl = WEBSITE_URL + "/" + cleanPath;
 
-        if (/android/i.test(navigator.userAgent)) {
-          window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
-            websiteUrl
-          )};end`;
-        } else {
-          window.location.href = appLink;
+        if (isInAppBrowser()) {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("inapp-section").style.display = "block";
+
+          document.getElementById("app-button").href = appLink;
+          document.getElementById("web-button").href = websiteUrl;
 
           setTimeout(function () {
             window.location.href = websiteUrl;
-          }, REDIRECT_TIMEOUT);
+          }, 3000);
+        } else {
+          if (/android/i.test(navigator.userAgent)) {
+            window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
+              websiteUrl
+            )};end`;
+          } else {
+            window.location.href = appLink;
+            setTimeout(function () {
+              window.location.href = websiteUrl;
+            }, REDIRECT_TIMEOUT);
+          }
         }
       };
     </script>
@@ -35,10 +49,52 @@
           Arial, sans-serif;
         text-align: center;
         padding: 30px;
+        margin: 0;
+      }
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 8px;
+      }
+      .web-button {
+        background-color: #28a745;
+      }
+      #inapp-section {
+        display: none;
+      }
+      .auto-text {
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
       }
     </style>
   </head>
   <body>
-    <p>Redirecting you to YouSport...</p>
+    <div class="container">
+      <div id="loading">
+        <p>Redirecting you to YouSport...</p>
+      </div>
+
+      <div id="inapp-section">
+        <h2>Open in YouSport</h2>
+        <p>Choose how you want to continue:</p>
+
+        <a id="app-button" class="button">Open in App</a>
+        <a id="web-button" class="button web-button">View on Website</a>
+
+        <p class="auto-text">
+          Automatically redirecting to website in 3 seconds...
+        </p>
+      </div>
+    </div>
   </body>
 </html>
