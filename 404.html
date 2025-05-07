@@ -31,12 +31,10 @@
           : "For the best experience, please copy this link and open it in Safari/Chrome:",
         appButton: isHungarian ? "Alkalmazás megnyitása" : "Open App",
         webButton: isHungarian ? "Weboldal megnyitása" : "Open Website",
-        redirecting: isHungarian
-          ? "Átirányítás a weboldalra 3 másodperc múlva..."
-          : "Redirecting to website in 3 seconds...",
         copyHint: isHungarian
           ? "Kattints a linkre a másoláshoz"
           : "Tap to copy link",
+        copied: isHungarian ? "Másolva!" : "Copied!",
       };
 
       function isInAppBrowser() {
@@ -49,6 +47,8 @@
         navigator.clipboard
           .writeText(text)
           .then(() => {
+            document.getElementById("copy-status").textContent =
+              translations.copied;
             document.getElementById("copy-status").style.display = "block";
             setTimeout(() => {
               document.getElementById("copy-status").style.display = "none";
@@ -74,10 +74,10 @@
           translations.appButton;
         document.getElementById("web-button").textContent =
           translations.webButton;
-        document.getElementById("auto-redirect").textContent =
-          translations.redirecting;
         document.getElementById("copy-hint").textContent =
           translations.copyHint;
+        document.getElementById("copy-status").textContent =
+          translations.copied;
 
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
@@ -91,7 +91,7 @@
           copyToClipboard(linkToCopy);
         };
 
-        // For in-app browsers - show specific UI
+        // For in-app browsers - show specific UI without auto-redirect
         if (isInAppBrowser()) {
           document.getElementById("loading").style.display = "none";
           document.getElementById("inapp-section").style.display = "block";
@@ -100,10 +100,8 @@
           document.getElementById("app-button").href = customSchemeLink;
           document.getElementById("web-button").href = websiteUrl;
 
-          // Auto-redirect to website after delay
-          setTimeout(function () {
-            window.location = websiteUrl;
-          }, 3000);
+          // No auto-redirect timeout for in-app browsers
+          // Let users read the message and choose their action
         } else {
           // For regular browsers, try to open app then fallback to website
           if (/android/i.test(navigator.userAgent)) {
@@ -199,12 +197,6 @@
         display: none;
       }
 
-      .auto-text {
-        font-size: 14px;
-        color: #666;
-        margin-top: 20px;
-      }
-
       .copy-block {
         margin-top: 20px;
         border-top: 1px solid #eee;
@@ -281,10 +273,6 @@
           <a id="app-button" class="button app-button" href="#">Open App</a>
           <a id="web-button" class="button web-button" href="#">Open Website</a>
         </div>
-
-        <p id="auto-redirect" class="auto-text">
-          Redirecting to website in 3 seconds...
-        </p>
 
         <div class="copy-block">
           <p id="external-hint">
