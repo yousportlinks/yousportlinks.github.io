@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Redirecting to YouSport...</title>
+    <title>Open YouSport</title>
     <script>
       const WEBSITE_URL = "https://yousportbeta.wordpress.com";
       const REDIRECT_TIMEOUT = 1500;
@@ -16,60 +16,30 @@
       window.onload = function () {
         const path = window.location.pathname;
         const cleanPath = path.replace(/^\/+/, "");
-
-        const universalLink = `https://yousportlinks.github.io/${cleanPath}`;
-
         const customSchemeLink = `yousport://${cleanPath}`;
         const websiteUrl = WEBSITE_URL + "/" + cleanPath;
 
+        // For in-app browsers - show options and auto-redirect to website
         if (isInAppBrowser()) {
           document.getElementById("loading").style.display = "none";
           document.getElementById("inapp-section").style.display = "block";
 
-          document
-            .getElementById("app-button")
-            .addEventListener("click", function () {
-              window.location.href = universalLink;
+          // Just set the href directly - sometimes this works better
+          document.getElementById("app-button").href = customSchemeLink;
+          document.getElementById("web-button").href = websiteUrl;
 
-              setTimeout(function () {
-                window.location = customSchemeLink;
-
-                const iframe = document.createElement("iframe");
-                iframe.style.display = "none";
-                iframe.src = customSchemeLink;
-                document.body.appendChild(iframe);
-              }, 500);
-
-              document.getElementById("attempt-message").style.display =
-                "block";
-            });
-
-          document
-            .getElementById("web-button")
-            .addEventListener("click", function () {
-              window.open(websiteUrl, "_blank");
-              window.location = websiteUrl;
-            });
-
+          // Auto-redirect to website after delay (most reliable option)
           setTimeout(function () {
             window.location = websiteUrl;
           }, 3000);
         } else {
+          // For regular browsers, try to open app then fallback to website
           if (/android/i.test(navigator.userAgent)) {
-            window.location.href = universalLink;
-
-            setTimeout(function () {
-              window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
-                websiteUrl
-              )};end`;
-            }, 500);
+            window.location.href = `intent://${cleanPath}#Intent;scheme=yousport;package=com.yousport.yousportapp;S.browser_fallback_url=${encodeURIComponent(
+              websiteUrl
+            )};end`;
           } else {
-            window.location.href = universalLink;
-
-            setTimeout(function () {
-              window.location.href = customSchemeLink;
-            }, 500);
-
+            window.location.href = customSchemeLink;
             setTimeout(function () {
               window.location.href = websiteUrl;
             }, REDIRECT_TIMEOUT);
@@ -98,7 +68,6 @@
         border-radius: 6px;
         font-weight: bold;
         margin: 8px;
-        cursor: pointer;
       }
       .web-button {
         background-color: #28a745;
@@ -119,6 +88,11 @@
         padding: 10px;
         border-radius: 4px;
       }
+      .alternative {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid #ddd;
+      }
     </style>
   </head>
   <body>
@@ -131,17 +105,35 @@
         <h2>Open in YouSport</h2>
         <p>Choose how you want to continue:</p>
 
-        <div id="app-button" class="button">Open in App</div>
-        <div id="web-button" class="button web-button">View on Website</div>
-
-        <div id="attempt-message">
-          Attempting to open app... If nothing happens, please tap "View on
-          Website" instead.
-        </div>
+        <!-- Use a elements with href instead of divs -->
+        <a id="app-button" class="button" href="#">Open in App</a>
+        <a id="web-button" class="button web-button" href="#"
+          >View on Website</a
+        >
 
         <p class="auto-text">
           Automatically redirecting to website in 3 seconds...
         </p>
+
+        <div class="alternative">
+          <p>
+            If the buttons don't work, try copying this link and opening it in
+            Safari/Chrome:
+          </p>
+          <code
+            id="copy-link"
+            style="
+              word-break: break-all;
+              background: #eee;
+              padding: 8px;
+              display: block;
+            "
+          ></code>
+          <script>
+            document.getElementById("copy-link").textContent =
+              window.location.href;
+          </script>
+        </div>
       </div>
     </div>
   </body>
