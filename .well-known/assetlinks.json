@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.yousport.yousportapp",
+      "sha256_cert_fingerprints": [
+        "9D:9F:9E:B9:E9:16:9D:5C:22:AB:5A:CA:7A:7F:46:09:D8:F6:98:CB:A8:64:46:37:EF:2E:26:93:04:C4:AF:6F"
+      ]
+    }
+  }
+]
